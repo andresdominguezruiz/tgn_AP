@@ -24,6 +24,7 @@ We furthermore show that several previous models for learning on dynamic graphs 
 ### Requirements
 
 Dependencies (with python >= 3.7):
+La usada en este repositorio ha sido Python 3.8
 
 ```{bash}
 pandas==1.1.0
