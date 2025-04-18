@@ -16,6 +16,19 @@ from utils.data_processing import get_data, compute_time_statistics
 torch.manual_seed(0)
 np.random.seed(0)
 
+'''
+
+****CÓDIGO PARA LA TAREA DE PREDICCIÓN DE ARISTAS****
+
+
+1º LECTURA DEL COMANDO, PREPARACIÓN DE LA CARPETA DE LOS MODELOS Y DE LOS CHECKPOINTS
+ Y CREACIÓN DEL LOGGER(servirá para escribir cosas en el terminal sin tener que usar
+ todo el rato print)
+
+
+
+'''
+
 ### Argument and global variables
 parser = argparse.ArgumentParser('TGN self-supervised training')
 parser.add_argument('-d', '--data', type=str, help='Dataset name (eg. wikipedia or reddit)',
@@ -35,6 +48,7 @@ parser.add_argument('--node_dim', type=int, default=100, help='Dimensions of the
 parser.add_argument('--time_dim', type=int, default=100, help='Dimensions of the time embedding')
 parser.add_argument('--backprop_every', type=int, default=1, help='Every how many batches to '
                                                                   'backprop')
+#ESTOS 5 SON LAS CONFIGURACIONES SOBRE LOS MÓDULOS#------------------------------
 parser.add_argument('--use_memory', action='store_true',
                     help='Whether to augment the model with a node memory')
 parser.add_argument('--embedding_module', type=str, default="graph_attention", choices=[
@@ -45,6 +59,7 @@ parser.add_argument('--memory_updater', type=str, default="gru", choices=[
   "gru", "rnn"], help='Type of memory updater')
 parser.add_argument('--aggregator', type=str, default="last", help='Type of message '
                                                                         'aggregator')
+#------------------------------------------------------------------------------------
 parser.add_argument('--memory_update_at_end', action='store_true',
                     help='Whether to update memory at the end or at the start of the batch')
 parser.add_argument('--message_dim', type=int, default=100, help='Dimensions of the messages')
@@ -107,6 +122,7 @@ ch.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 logger.info(args)
+#---------------------------------------------------------------------------------------
 
 ### Extract data for training, validation and testing
 node_features, edge_features, full_data, train_data, val_data, test_data, new_node_val_data, \
@@ -221,6 +237,8 @@ for i in range(args.n_runs):
                                                             timestamps_batch, edge_idxs_batch, NUM_NEIGHBORS)
 
         loss += criterion(pos_prob.squeeze(), pos_label) + criterion(neg_prob.squeeze(), neg_label)
+      
+      #Después de calcular los errores de un batch, haces la media del error y con esa media haces el backpropagation
 
       loss /= args.backprop_every
 
@@ -300,7 +318,7 @@ for i in range(args.n_runs):
       break
     else:
       torch.save(tgn.state_dict(), get_checkpoint_path(epoch))
-
+  #---------------------------------------------------------------------------------------------
   # Training has finished, we have loaded the best model, and we want to backup its current
   # memory (which has seen validation edges) so that it can also be used when testing on unseen
   # nodes

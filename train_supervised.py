@@ -19,6 +19,12 @@ random.seed(0)
 np.random.seed(0)
 torch.manual_seed(0)
 
+'''
+
+**** CÓDIGO PARA LA CLASIFICACIÓN DE NODOS ****
+
+'''
+
 ### Argument and global variables
 parser = argparse.ArgumentParser('TGN self-supervised training')
 parser.add_argument('-d', '--data', type=str, help='Dataset name (eg. wikipedia or reddit)',

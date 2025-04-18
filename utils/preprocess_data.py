@@ -39,9 +39,11 @@ def preprocess(data_name):
 def reindex(df, bipartite=True):
   new_df = df.copy()
   if bipartite:
+    #esto sirve para asegurarse que la cantidad de nodos diferentes es = al max-min +1 de los mismos
     assert (df.u.max() - df.u.min() + 1 == len(df.u.unique()))
     assert (df.i.max() - df.i.min() + 1 == len(df.i.unique()))
 
+    #Aqui lo que se está haciendo es que el indice de los items SEA DIFERENTE al de los users
     upper_u = df.u.max() + 1
     new_i = df.i + upper_u
 
@@ -64,11 +66,15 @@ def run(data_name, bipartite=True):
   OUT_FEAT = './data/ml_{}.npy'.format(data_name)
   OUT_NODE_FEAT = './data/ml_{}_node.npy'.format(data_name)
 
-  df, feat = preprocess(PATH)
-  new_df = reindex(df, bipartite)
+  df, feat = preprocess(PATH) #1º Se extrae del csv original un df con todas las columnas MENOS LA DE LAS PROPIEDADES
+  new_df = reindex(df, bipartite) #2º Reindexas el dataframe
+  #En caso de que sea bipartito, lo importante es que evitas que el grupo de items
+  #use el mismo indexado que el de los users.
 
   empty = np.zeros(feat.shape[1])[np.newaxis, :]
   feat = np.vstack([empty, feat])
+  #Con esto último, se aseguran de que los vectores de features de cada evento tengan el mismo
+  #tamaño, y en caso de que no, los completas con 0s.
 
   max_idx = max(new_df.u.max(), new_df.i.max())
   rand_feat = np.zeros((max_idx + 1, 172))
